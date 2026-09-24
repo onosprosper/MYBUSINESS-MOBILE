@@ -56,7 +56,7 @@ class _SignupScreenState extends State<SignupScreen> {
         TextFormField(controller: business, decoration: const InputDecoration(labelText: 'Business name'),
           validator: (v) => (v ?? '').trim().isEmpty ? 'Enter your business name' : null),
         const SizedBox(height: 16),
-        DropdownButtonFormField<String>(value: type, decoration: const InputDecoration(labelText: 'What does your business offer?'),
+        DropdownButtonFormField<String>(initialValue: type, decoration: const InputDecoration(labelText: 'What does your business offer?'),
           items: const [DropdownMenuItem(value: 'products', child: Text('Products or general business')),
             DropdownMenuItem(value: 'services', child: Text('Services and appointments')),
             DropdownMenuItem(value: 'both', child: Text('Both products and services'))],
@@ -77,3 +77,4 @@ class _SignupScreenState extends State<SignupScreen> {
     ))),
   );
 }
+

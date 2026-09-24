@@ -52,8 +52,8 @@ class _ServicesScreenState extends State<ServicesScreen> {
       });
       name.clear(); price.clear(); description.clear();
       await load();
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Service added to your public booking menu')));
+      if (mounted) { ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Service added to your public booking menu'))); }
     } catch (e) {
       if (mounted) setState(() => error = e.toString().replaceFirst('Exception: ', ''));
     } finally {
@@ -106,3 +106,4 @@ class _ServicesScreenState extends State<ServicesScreen> {
     ])),
   );
 }
+
