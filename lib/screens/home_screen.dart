@@ -3,6 +3,7 @@ import '../services/api_service.dart';
 import 'login_screen.dart';
 import 'list_screen.dart';
 import 'reports_screen.dart';
+import 'services_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -149,6 +150,14 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
             const SizedBox(height: 22),
+            Card(child: ListTile(
+              leading: const Icon(Icons.event_available),
+              title: const Text('Set up services'),
+              subtitle: const Text('Add treatments, prices and durations for online bookings'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const ServicesScreen())),
+            )),
             const _SectionTitle('Business'),
             _nav('Sales', 'Revenue, payments and customer order status', Icons.point_of_sale, () {
               _openList('Sales', '/api/v1/orders', 'orders', ['orders', 'data']);

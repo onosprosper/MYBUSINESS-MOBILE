@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import 'home_screen.dart';
+import 'signup_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -108,6 +109,11 @@ class _LoginScreenState extends State<LoginScreen> {
                           : const Text('Log in', style: TextStyle(fontWeight: FontWeight.bold)),
                     ),
                     const SizedBox(height: 12),
+                    TextButton(
+                      onPressed: () => Navigator.push(context,
+                        MaterialPageRoute(builder: (_) => const SignupScreen())),
+                      child: const Text('Create a business account'),
+                    ),
                     const Text(
                       'Do not share your password or access token.',
                       textAlign: TextAlign.center,
