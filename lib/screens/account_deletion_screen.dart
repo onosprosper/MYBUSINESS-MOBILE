@@ -22,18 +22,26 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
   }
 
   Future<void> submit() async {
-    if (password.text.isEmpty || sending) return;
+    if (password.text.isEmpty || sending) {
+      return;
+    }
     setState(() { sending = true; error = null; });
     try {
       final result = await ApiService.instance.postJson(
         '/api/v1/account/deletion-request', {'password': password.text});
-      if (mounted) setState(() => message = result['message']?.toString() ??
-        'Your deletion request was received.');
+      if (mounted) {
+        setState(() => message = result['message']?.toString() ??
+          'Your deletion request was received.');
+      }
     } catch (e) {
-      if (mounted) setState(() => error = e.toString().replaceFirst('Exception: ', ''));
+      if (mounted) {
+        setState(() => error = e.toString().replaceFirst('Exception: ', ''));
+      }
     } finally {
       password.clear();
-      if (mounted) setState(() => sending = false);
+      if (mounted) {
+        setState(() => sending = false);
+      }
     }
   }
 
