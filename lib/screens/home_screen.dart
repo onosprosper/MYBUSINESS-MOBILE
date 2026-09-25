@@ -4,6 +4,8 @@ import 'login_screen.dart';
 import 'list_screen.dart';
 import 'reports_screen.dart';
 import 'services_screen.dart';
+import 'web_dashboard_screen.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -40,6 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> logout() async {
     await ApiService.instance.logout();
+    await WebViewCookieManager().clearCookies();
     if (!mounted) return;
     Navigator.pushAndRemoveUntil(
       context,
@@ -72,13 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => ModuleInfoScreen(
-          title: title,
-          icon: icon,
-          description: description,
-          webPath: webPath,
-          status: status,
-        ),
+        builder: (_) => WebDashboardScreen(title: title, path: webPath),
       ),
     );
   }
@@ -150,6 +147,10 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
             const SizedBox(height: 22),
+            _nav('Full business dashboard', 'Use every web feature on your phone', Icons.dashboard_outlined, () {
+              Navigator.push(context, MaterialPageRoute(
+                builder: (_) => const WebDashboardScreen(title: 'Business dashboard', path: '/dashboard')));
+            }),
             Card(child: ListTile(
               leading: const Icon(Icons.event_available),
               title: const Text('Set up services'),
@@ -158,6 +159,14 @@ class _HomeScreenState extends State<HomeScreen> {
               onTap: () => Navigator.push(context,
                 MaterialPageRoute(builder: (_) => const ServicesScreen())),
             )),
+            _nav('Bookings', 'Manage requests, payment status and appointments', Icons.calendar_month_outlined, () {
+              _openModuleInfo(title: 'Bookings', icon: Icons.calendar_month_outlined,
+                description: 'Manage service bookings.', webPath: '/dashboard/bookings');
+            }),
+            _nav('Shop photos and service menu', 'Upload shop photos and manage your public services', Icons.photo_library_outlined, () {
+              _openModuleInfo(title: 'Shop photos and service menu', icon: Icons.photo_library_outlined,
+                description: 'Manage your shop gallery and services.', webPath: '/dashboard/services');
+            }),
             const _SectionTitle('Business'),
             _nav('Sales', 'Revenue, payments and customer order status', Icons.point_of_sale, () {
               _openList('Sales', '/api/v1/orders', 'orders', ['orders', 'data']);

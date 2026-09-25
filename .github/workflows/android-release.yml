@@ -1,0 +1,57 @@
+name: Android signed release
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - name: Restore private signing key
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
+        run: |
+          python3 - <<'PY'
+          import base64, os, pathlib
+          required = ('KEYSTORE_BASE64', 'KEY_ALIAS', 'KEY_PASSWORD', 'STORE_PASSWORD')
+          if any(not os.environ.get(name) for name in required):
+              raise SystemExit('Configure all four Android signing secrets before building a release.')
+          pathlib.Path('android/app/upload-keystore.jks').write_bytes(base64.b64decode(os.environ['KEYSTORE_BASE64'], validate=True))
+          pathlib.Path('android/key.properties').write_text(
+              'storePassword=' + os.environ['STORE_PASSWORD'] + '\n' +
+              'keyPassword=' + os.environ['KEY_PASSWORD'] + '\n' +
+              'keyAlias=' + os.environ['KEY_ALIAS'] + '\n' +
+              'storeFile=upload-keystore.jks\n'
+          )
+          PY
+      - name: Install dependencies
+        run: flutter pub get
+      - name: Analyze Dart code
+        run: flutter analyze
+      - name: Build signed APK and Play bundle
+        run: |
+          flutter build apk --release
+          flutter build appbundle --release
+      - name: Save signed builds
+        uses: actions/upload-artifact@v4
+        with:
+          name: mybusiness-signed-android-release
+          path: |
+            build/app/outputs/flutter-apk/app-release.apk
+            build/app/outputs/bundle/release/app-release.aab
+          if-no-files-found: error
+          retention-days: 7
