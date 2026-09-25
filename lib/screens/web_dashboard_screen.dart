@@ -20,7 +20,8 @@ class _WebDashboardScreenState extends State<WebDashboardScreen> {
   @override
   void initState() {
     super.initState();
-    final path = widget.path.startsWith('/dashboard') ? widget.path : '/dashboard';
+    final path = widget.path == '/data-deletion' || widget.path.startsWith('/dashboard')
+        ? widget.path : '/dashboard';
     controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setNavigationDelegate(NavigationDelegate(

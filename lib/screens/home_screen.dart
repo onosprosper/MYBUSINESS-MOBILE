@@ -5,6 +5,7 @@ import 'list_screen.dart';
 import 'reports_screen.dart';
 import 'services_screen.dart';
 import 'web_dashboard_screen.dart';
+import 'account_deletion_screen.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -218,6 +219,9 @@ class _HomeScreenState extends State<HomeScreen> {
     _nav('Subscription', 'Your MYBUSINESS plan', Icons.workspace_premium_outlined,
       () => _openModuleInfo(title: 'Subscription', icon: Icons.workspace_premium_outlined,
         description: '', webPath: '/dashboard/subscription')),
+    _nav('Request account deletion', 'Request deletion of your account and associated data',
+      Icons.person_remove_outlined, () => Navigator.push(context,
+        MaterialPageRoute(builder: (_) => const AccountDeletionScreen()))),
     OutlinedButton.icon(onPressed: logout, icon: const Icon(Icons.logout),
       label: const Text('Sign out')),
   ]);
@@ -294,4 +298,3 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       );
 }
-

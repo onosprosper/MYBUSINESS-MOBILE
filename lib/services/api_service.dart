@@ -91,7 +91,7 @@ class ApiService {
       throw Exception('Session expired. Please log in again.');
     }
     if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw Exception(data['error'] ?? 'Request failed (${response.statusCode})');
+      throw Exception(data['error'] ?? data['message'] ?? 'Request failed (${response.statusCode})');
     }
     return data;
   }
