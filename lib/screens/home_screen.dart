@@ -70,7 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
     required IconData icon,
     required String description,
     required String webPath,
-    String status = 'Web dashboard ready. Mobile edit screen will be connected after launch.',
+
   }) {
     Navigator.push(
       context,
@@ -405,3 +405,4 @@ class _SectionTitle extends StatelessWidget {
         child: Text(text, style: const TextStyle(fontSize: 21, fontWeight: FontWeight.bold)),
       );
 }
+
