@@ -134,7 +134,16 @@ class _HomeScreenState extends State<HomeScreen> {
     RefreshIndicator(onRefresh: load, child: ListView(
       padding: const EdgeInsets.all(16), children: [
         Text(business['name']?.toString() ?? 'Your business',
-          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+           style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 4),
+          Text(
+            'Plan: ${(business['plan']?.toString().trim().isNotEmpty ?? false) ? business['plan'].toString().trim() : 'Free'}',
+            style: const TextStyle(
+              color: Colors.white70,
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         const Text('Your business at a glance', style: TextStyle(color: Colors.white70)),
         const SizedBox(height: 12),
         if (loading) const LinearProgressIndicator(minHeight: 2),
