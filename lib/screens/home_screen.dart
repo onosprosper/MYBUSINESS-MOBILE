@@ -22,6 +22,15 @@ class _HomeScreenState extends State<HomeScreen> {
   int selectedTab = 0;
   String toolSearch = '';
 
+  Map<String, dynamic> get _business =>
+      (data?['business'] as Map<String, dynamic>?) ?? {};
+
+  String get _businessType =>
+      (_business['business_type']?.toString() ?? 'products').toLowerCase();
+
+  bool get _supportsServices =>
+      const {'salon', 'services', 'both'}.contains(_businessType);
+
   @override
   void initState() {
     super.initState();
@@ -89,23 +98,33 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(['MYBUSINESS', 'All tools', 'Services', 'Account'][selectedTab], style: const TextStyle(fontWeight: FontWeight.w900)),
+        title: Text(
+          selectedTab == 0 ? 'MYBUSINESS'
+              : selectedTab == 1 ? 'All tools'
+              : selectedTab == 2 && _supportsServices ? 'Services'
+              : 'Account',
+          style: const TextStyle(fontWeight: FontWeight.w900),
+        ),
         actions: [
           IconButton(onPressed: load, icon: const Icon(Icons.refresh)),
           IconButton(onPressed: logout, icon: const Icon(Icons.logout)),
         ],
       ),
       body: selectedTab == 0 ? _compactHome(stats, business)
-        : selectedTab == 1 ? _allToolsTab()
-        : selectedTab == 2 ? _servicesTab() : _accountTab(),
+          : selectedTab == 1 ? _allToolsTab()
+          : selectedTab == 2 && _supportsServices ? _servicesTab()
+          : _accountTab(),
       bottomNavigationBar: NavigationBar(
-        selectedIndex: selectedTab,
-        onDestinationSelected: (index) => setState(() => selectedTab = index),
-        destinations: const [
-          NavigationDestination(icon: Icon(Icons.home_outlined), label: 'Home'),
-          NavigationDestination(icon: Icon(Icons.grid_view_outlined), label: 'All tools'),
-          NavigationDestination(icon: Icon(Icons.design_services_outlined), label: 'Services'),
-          NavigationDestination(icon: Icon(Icons.person_outline), label: 'Account'),
+        selectedIndex: selectedTab == 3 && !_supportsServices ? 2 : selectedTab,
+        onDestinationSelected: (index) => setState(() {
+          selectedTab = !_supportsServices && index == 2 ? 3 : index;
+        }),
+        destinations: [
+          const NavigationDestination(icon: Icon(Icons.home_outlined), label: 'Home'),
+          const NavigationDestination(icon: Icon(Icons.grid_view_outlined), label: 'All tools'),
+          if (_supportsServices)
+            const NavigationDestination(icon: Icon(Icons.design_services_outlined), label: 'Services'),
+          const NavigationDestination(icon: Icon(Icons.person_outline), label: 'Account'),
         ],
       ),
     );
@@ -134,10 +153,12 @@ class _HomeScreenState extends State<HomeScreen> {
           ]))),
         const SizedBox(height: 12),
         _compactSection('Quick actions', _toolGrid([
-          _tool('Services', Icons.design_services_outlined, () => Navigator.push(context,
-            MaterialPageRoute(builder: (_) => const ServicesScreen()))),
-          _tool('Bookings', Icons.calendar_month_outlined, () => _openModuleInfo(title: 'Bookings',
-            icon: Icons.calendar_month_outlined, description: '', webPath: '/dashboard/bookings')),
+          if (_supportsServices)
+            _tool('Services', Icons.design_services_outlined, () => Navigator.push(context,
+              MaterialPageRoute(builder: (_) => const ServicesScreen()))),
+          if (_supportsServices)
+            _tool('Bookings', Icons.calendar_month_outlined, () => _openModuleInfo(title: 'Bookings',
+              icon: Icons.calendar_month_outlined, description: '', webPath: '/dashboard/bookings')),
           _tool('Products', Icons.inventory_2_outlined, () => _openList('Products', '/api/v1/products', 'products', ['products', 'data'])),
           _tool('Orders', Icons.shopping_bag_outlined, () => _openList('Orders', '/api/v1/orders', 'orders', ['orders', 'data'])),
           _tool('Customers', Icons.people_outline, () => _openList('Customers', '/api/v1/customers', 'customers', ['customers', 'data'])),
@@ -147,13 +168,14 @@ class _HomeScreenState extends State<HomeScreen> {
             MaterialPageRoute(builder: (_) => const ReportsScreen()))),
           _tool('All tools', Icons.grid_view, () => setState(() => selectedTab = 1)),
         ])),
-        _compactSection('Your shop', ListTile(
-          leading: const Icon(Icons.photo_library_outlined, color: Color(0xFF22C55E)),
-          title: const Text('Shop photos and service menu'),
-          subtitle: const Text('What customers see when booking'),
-          trailing: const Icon(Icons.chevron_right),
-          onTap: () => _openModuleInfo(title: 'Shop photos and service menu',
-            icon: Icons.photo_library_outlined, description: '', webPath: '/dashboard/services'))),
+        if (_supportsServices)
+          _compactSection('Your shop', ListTile(
+            leading: const Icon(Icons.photo_library_outlined, color: Color(0xFF22C55E)),
+            title: const Text('Shop photos and service menu'),
+            subtitle: const Text('What customers see when booking'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => _openModuleInfo(title: 'Shop photos and service menu',
+              icon: Icons.photo_library_outlined, description: '', webPath: '/dashboard/services'))),
         TextButton.icon(icon: const Icon(Icons.dashboard_outlined),
           label: const Text('Open full business dashboard'),
           onPressed: () => _openModuleInfo(title: 'Business dashboard',
@@ -240,14 +262,15 @@ class _HomeScreenState extends State<HomeScreen> {
       decoration: const InputDecoration(prefixIcon: Icon(Icons.search),
         hintText: 'Search tools', isDense: true)),
     const SizedBox(height: 14),
-    _toolCategory('Services & bookings', [
-      ('Service setup', Icons.design_services_outlined, () => Navigator.push(context,
-        MaterialPageRoute(builder: (_) => const ServicesScreen()))),
-      ('Bookings', Icons.calendar_month_outlined, () => _openModuleInfo(title: 'Bookings',
-        icon: Icons.calendar_month_outlined, description: '', webPath: '/dashboard/bookings')),
-      ('Shop gallery', Icons.photo_library_outlined, () => _openModuleInfo(title: 'Shop gallery',
-        icon: Icons.photo_library_outlined, description: '', webPath: '/dashboard/services')),
-    ]),
+    if (_supportsServices)
+      _toolCategory('Services & bookings', [
+        ('Service setup', Icons.design_services_outlined, () => Navigator.push(context,
+          MaterialPageRoute(builder: (_) => const ServicesScreen()))),
+        ('Bookings', Icons.calendar_month_outlined, () => _openModuleInfo(title: 'Bookings',
+          icon: Icons.calendar_month_outlined, description: '', webPath: '/dashboard/bookings')),
+        ('Shop gallery', Icons.photo_library_outlined, () => _openModuleInfo(title: 'Shop gallery',
+          icon: Icons.photo_library_outlined, description: '', webPath: '/dashboard/services')),
+      ]),
     _toolCategory('Sales & stock', [
       ('Products', Icons.inventory_2_outlined, () => _openList('Products', '/api/v1/products', 'products', ['products', 'data'])),
       ('Inventory', Icons.warehouse_outlined, () => _openModuleInfo(title: 'Inventory', icon: Icons.warehouse_outlined,

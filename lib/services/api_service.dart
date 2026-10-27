@@ -6,7 +6,7 @@ class ApiService {
   ApiService._();
   static final instance = ApiService._();
 
-  static const baseUrl = 'https://mybusiness-ng.onrender.com';
+  static const baseUrl = 'https://mybusiness-ng.com';
   static const _tokenKey = 'mybusiness_access_token';
 
   Future<String?> _token() async {
